@@ -35,11 +35,9 @@ class PageController extends Controller
         $image = $request->file('image');
 
         if($image){
-            $image_full = time().$image->getClientOriginalName();
+            $ruta = "blog-laravel";
 
-            \Storage::disk('images')->put($image_full, \File::get($image));
-
-            $image->image_path=$image_full;
+            $response = cloudinary()->upload($request->file('file')->getRealPath(), array("folder" => $ruta))->getSecurepath();
         }
 
         $course = new Course();
@@ -48,7 +46,7 @@ class PageController extends Controller
         $course->slug = 'tag';
         $course->category_id = $request->category;
         $course->description = $request->description;
-        $course->image = $image_full;
+        $course->image = $response;
         $course->save();
 
         return redirect('course-create')->with([
